@@ -42,15 +42,19 @@ def main():
         try:
             check_for_redirect(response)
         except requests.exceptions.HTTPError:
-            print(f'Book #{book_id} not found')
+            # print(f'Book #{book_id} not found')
             continue
         page_soup = BeautifulSoup(response.text, 'lxml')
         book_soup = page_soup.find('div', {'id': 'content'})
         book_title = book_soup.find('h1').text.replace('\xa0', '').replace('  ', '').split('::')
         book_image_url = urljoin(url_book_page, book_soup.find('div', class_='bookimage').find('img').attrs['src'])
         filename = str(book_id) + '. ' + ''.join((book_title[1], ' - ', book_title[0]))
-        download_txt(url_book_download.format(book_id), filename)
-        download_image(book_image_url)
+        book_comments = [comment.string for comment in book_soup.find_all('span', class_='black')]
+        # download_txt(url_book_download.format(book_id), filename)
+        # download_image(book_image_url)
+        print(filename)
+        print(*book_comments, sep='\n')
+        print()
 
 
 if __name__ == '__main__':
