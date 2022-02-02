@@ -50,10 +50,12 @@ def main():
         book_image_url = urljoin(url_book_page, book_soup.find('div', class_='bookimage').find('img').attrs['src'])
         filename = str(book_id) + '. ' + ''.join((book_title[1], ' - ', book_title[0]))
         book_comments = [comment.string for comment in book_soup.find_all('span', class_='black')]
+        book_genres = [genre.get_text() for genre in book_soup.find('span', class_='d_book').find_all('a')]
         # download_txt(url_book_download.format(book_id), filename)
         # download_image(book_image_url)
         print(filename)
-        print(*book_comments, sep='\n')
+        # print(*book_comments, sep='\n')
+        print(book_genres)
         print()
 
 
