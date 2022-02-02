@@ -5,6 +5,7 @@ from urllib.parse import urljoin, urlparse
 import pathvalidate
 import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 URL_BOOK_PAGE = 'http://tululu.org/b{}/'
 
@@ -33,7 +34,7 @@ def download_txt(url, filename, folder='books'):
         with open(os.path.join(folder, pathvalidate.sanitize_filename(filename)), 'wb') as file:
             file.write(response.content)
     else:
-        print('The book is not present on this format')
+        print('\nThe book is not present on this format')
 
 
 def parse_book_page(page_content):
@@ -55,13 +56,13 @@ def main():
     parse.add_argument('end_id', type=int, nargs='?', default=0)
     args = parse.parse_args()
 
-    for book_id in range(args.start_id, args.start_id + 1 if not args.end_id else args.end_id + 1):
+    for book_id in tqdm(range(args.start_id, args.start_id + 1 if not args.end_id else args.end_id + 1)):
         response = requests.get(URL_BOOK_PAGE.format(book_id))
         response.raise_for_status()
         try:
             check_for_redirect(response)
         except requests.exceptions.HTTPError:
-            print(f'Page of the book #{book_id} is not found')
+            print(f'\nPage of the book #{book_id} is not found')
             continue
         page_soup = BeautifulSoup(response.text, 'lxml')
         download_txt(
