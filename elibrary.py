@@ -6,6 +6,8 @@ import pathvalidate
 import requests
 from bs4 import BeautifulSoup
 
+URL_BOOK_PAGE = 'http://tululu.org/b{}/'
+
 
 def check_for_redirect(response):
     if response.history:
@@ -32,12 +34,22 @@ def download_txt(url, filename, folder='books'):
             file.write(response.content)
 
 
+def parse_book_page(page_content):
+    book_soup = page_content.find('div', {'id': 'content'})
+    book_info = {
+        'book_title': [book_soup.find('h1').text.replace('\xa0', '').replace('  ', '').split('::')],
+        'book_image_url': urljoin(URL_BOOK_PAGE, book_soup.find('div', class_='bookimage').find('img').attrs['src']),
+        'book_comments': [comment.string for comment in book_soup.find_all('span', class_='black')],
+        'book_genres': [genre.get_text() for genre in book_soup.find('span', class_='d_book').find_all('a')]
+    }
+    return book_info
+
+
 def main():
-    url_book_page = 'http://tululu.org/b{}/'
     url_book_download = 'http://tululu.org/txt.php?id={}'
 
-    for book_id in range(1, 10):
-        response = requests.get(url_book_page.format(book_id))
+    for book_id in range(9, 10):
+        response = requests.get(URL_BOOK_PAGE.format(book_id))
         response.raise_for_status()
         try:
             check_for_redirect(response)
@@ -45,18 +57,8 @@ def main():
             # print(f'Book #{book_id} not found')
             continue
         page_soup = BeautifulSoup(response.text, 'lxml')
-        book_soup = page_soup.find('div', {'id': 'content'})
-        book_title = book_soup.find('h1').text.replace('\xa0', '').replace('  ', '').split('::')
-        book_image_url = urljoin(url_book_page, book_soup.find('div', class_='bookimage').find('img').attrs['src'])
-        filename = str(book_id) + '. ' + ''.join((book_title[1], ' - ', book_title[0]))
-        book_comments = [comment.string for comment in book_soup.find_all('span', class_='black')]
-        book_genres = [genre.get_text() for genre in book_soup.find('span', class_='d_book').find_all('a')]
         # download_txt(url_book_download.format(book_id), filename)
         # download_image(book_image_url)
-        print(filename)
-        # print(*book_comments, sep='\n')
-        print(book_genres)
-        print()
 
 
 if __name__ == '__main__':
