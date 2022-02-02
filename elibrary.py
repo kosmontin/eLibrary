@@ -1,6 +1,5 @@
 import argparse
 import os
-import urllib.parse
 from urllib.parse import urljoin, urlparse
 
 import pathvalidate
@@ -16,7 +15,7 @@ def check_for_redirect(response):
 
 
 def download_image(url, folder='images'):
-    filename = os.path.basename(urllib.parse.urlparse(url).path)
+    filename = os.path.basename(urlparse(url).path)
     response = requests.get(url)
     response.raise_for_status()
     if not os.path.exists(folder):
@@ -31,14 +30,16 @@ def download_txt(url, filename, folder='books'):
     if not os.path.exists(folder):
         os.makedirs(folder)
     if not response.history:
-        with open(os.path.join(folder, pathvalidate.sanitize_filename(filename) + '.txt'), 'wb') as file:
+        with open(os.path.join(folder, pathvalidate.sanitize_filename(filename)), 'wb') as file:
             file.write(response.content)
+    else:
+        print('The book is not present on this format')
 
 
 def parse_book_page(page_content):
     book_soup = page_content.find('div', {'id': 'content'})
     book_info = {
-        'book_title': [book_soup.find('h1').text.replace('\xa0', '').replace('  ', '').split('::')],
+        'book_title': book_soup.find('h1').text.replace('\xa0', '').replace('  ', '').split('::'),
         'book_image_url': urljoin(URL_BOOK_PAGE, book_soup.find('div', class_='bookimage').find('img').attrs['src']),
         'book_comments': [comment.string for comment in book_soup.find_all('span', class_='black')],
         'book_genres': [genre.get_text() for genre in book_soup.find('span', class_='d_book').find_all('a')]
@@ -48,8 +49,9 @@ def parse_book_page(page_content):
 
 def main():
     url_book_download = 'http://tululu.org/txt.php?id={}'
+
     parse = argparse.ArgumentParser()
-    parse.add_argument('start_id', type=int, nargs='?', default=0)
+    parse.add_argument('start_id', type=int, nargs='?', default=1)
     parse.add_argument('end_id', type=int, nargs='?', default=0)
     args = parse.parse_args()
 
@@ -59,13 +61,14 @@ def main():
         try:
             check_for_redirect(response)
         except requests.exceptions.HTTPError:
-            # print(f'Book #{book_id} not found')
+            print(f'Page of the book #{book_id} is not found')
             continue
         page_soup = BeautifulSoup(response.text, 'lxml')
-        # download_txt(url_book_download.format(book_id), filename)
-        # download_image(book_image_url)
-        print(parse_book_page(page_soup))
-        print()
+        download_txt(
+            url_book_download.format(book_id),
+            f'{book_id}. {parse_book_page(page_soup)["book_title"][0]}.txt'
+        )
+        download_image(parse_book_page(page_soup)['book_image_url'])
 
 
 if __name__ == '__main__':
