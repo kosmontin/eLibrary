@@ -1,3 +1,4 @@
+import argparse
 import os
 import urllib.parse
 from urllib.parse import urljoin, urlparse
@@ -47,8 +48,12 @@ def parse_book_page(page_content):
 
 def main():
     url_book_download = 'http://tululu.org/txt.php?id={}'
+    parse = argparse.ArgumentParser()
+    parse.add_argument('start_id', type=int, nargs='?', default=0)
+    parse.add_argument('end_id', type=int, nargs='?', default=0)
+    args = parse.parse_args()
 
-    for book_id in range(9, 10):
+    for book_id in range(args.start_id, args.start_id + 1 if not args.end_id else args.end_id + 1):
         response = requests.get(URL_BOOK_PAGE.format(book_id))
         response.raise_for_status()
         try:
@@ -59,6 +64,8 @@ def main():
         page_soup = BeautifulSoup(response.text, 'lxml')
         # download_txt(url_book_download.format(book_id), filename)
         # download_image(book_image_url)
+        print(parse_book_page(page_soup))
+        print()
 
 
 if __name__ == '__main__':
