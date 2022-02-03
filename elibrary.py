@@ -34,8 +34,9 @@ def download_txt(url: tuple, filename, folder='books'):
 
 def parse_book_page(page_content):
     book_soup = page_content.find('div', {'id': 'content'})
+    book_name, book_author = book_soup.find('h1').text.replace('\xa0', '').replace('  ', '').split('::')
     book_info = {
-        'book_title': book_soup.find('h1').text.replace('\xa0', '').replace('  ', '').split('::'),
+        'book_title': {'book_author': book_author, 'book_name': book_name},
         'book_image_url': urljoin(URL_BOOK_PAGE, book_soup.find('div', class_='bookimage').find('img').attrs['src']),
         'book_comments': [comment.string for comment in book_soup.find_all('span', class_='black')],
         'book_genres': [genre.get_text() for genre in book_soup.find('span', class_='d_book').find_all('a')]
@@ -72,10 +73,10 @@ def main():
         try:
             download_txt(
                 (url_book_download, {'id': book_id}),
-                f'{book_id}. {book_info["book_title"][0]}.txt'
+                f'{book_id}. {book_info["book_title"]["book_name"]}.txt'
             )
         except:
-            print(f'Error download txt file of book #{book_id}')
+            print(f'\nError download txt file of book #{book_id}')
 
         try:
             download_image(book_info['book_image_url'])
