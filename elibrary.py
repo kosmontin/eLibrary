@@ -1,6 +1,6 @@
 import argparse
 import os
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlencode
 
 import pathvalidate
 import requests
@@ -25,8 +25,8 @@ def download_image(url, folder='images'):
         file.write(response.content)
 
 
-def download_txt(url, filename, folder='books'):
-    response = requests.get(url)
+def download_txt(url: tuple, filename, folder='books'):
+    response = requests.get(url[0], params=url[1])
     response.raise_for_status()
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -49,7 +49,7 @@ def parse_book_page(page_content):
 
 
 def main():
-    url_book_download = 'http://tululu.org/txt.php?id={}'
+    url_book_download = 'http://tululu.org/txt.php'
 
     parse = argparse.ArgumentParser()
     parse.add_argument('start_id', type=int, nargs='?', default=1)
@@ -66,7 +66,7 @@ def main():
             continue
         page_soup = BeautifulSoup(response.text, 'lxml')
         download_txt(
-            url_book_download.format(book_id),
+            (url_book_download, {'id': book_id}),
             f'{book_id}. {parse_book_page(page_soup)["book_title"][0]}.txt'
         )
         download_image(parse_book_page(page_soup)['book_image_url'])
