@@ -72,17 +72,18 @@ def main():
             continue
 
         page_soup = BeautifulSoup(response.text, 'lxml')
+        book_info = parse_book_page(page_soup)
 
         try:
             download_txt(
                 (url_book_download, {'id': book_id}),
-                f'{book_id}. {parse_book_page(page_soup)["book_title"][0]}.txt'
+                f'{book_id}. {book_info["book_title"][0]}.txt'
             )
         except:
             print(f'Error download txt file of book #{book_id}')
 
         try:
-            download_image(parse_book_page(page_soup)['book_image_url'])
+            download_image(book_info['book_image_url'])
         except:
             print(f'Error download image file of book #{book_id}')
 
