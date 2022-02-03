@@ -28,8 +28,8 @@ def download_txt(url: tuple, filename, folder='books'):
     response = requests.get(url[0], params=url[1])
     response.raise_for_status()
     os.makedirs(folder, exist_ok=True)
-    with open(os.path.join(folder, pathvalidate.sanitize_filename(filename)), 'wb') as file:
-        file.write(response.content)
+    with open(os.path.join(folder, pathvalidate.sanitize_filename(filename)), 'w') as file:
+        file.write(response.text)
 
 
 def parse_book_page(page_content):
