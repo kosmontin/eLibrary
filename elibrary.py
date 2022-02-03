@@ -1,6 +1,6 @@
 import argparse
 import os
-from urllib.parse import urljoin, urlparse, urlencode
+from urllib.parse import urljoin, urlparse
 
 import pathvalidate
 import requests
@@ -30,11 +30,8 @@ def download_txt(url: tuple, filename, folder='books'):
     response.raise_for_status()
     if not os.path.exists(folder):
         os.makedirs(folder)
-    if not response.history:
-        with open(os.path.join(folder, pathvalidate.sanitize_filename(filename)), 'wb') as file:
-            file.write(response.content)
-    else:
-        print('\nThe book is not present on this format')
+    with open(os.path.join(folder, pathvalidate.sanitize_filename(filename)), 'wb') as file:
+        file.write(response.content)
 
 
 def parse_book_page(page_content):
