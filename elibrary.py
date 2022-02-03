@@ -57,19 +57,34 @@ def main():
     args = parse.parse_args()
 
     for book_id in tqdm(range(args.start_id, args.start_id + 1 if not args.end_id else args.end_id + 1)):
-        response = requests.get(URL_BOOK_PAGE.format(book_id))
-        response.raise_for_status()
+        try:
+            response = requests.get(URL_BOOK_PAGE.format(book_id))
+            response.raise_for_status()
+        except Exception as e:
+            print(f'Error opening page with book #{book_id}. \nDetails below: ')
+            print(e.args)
+            continue
+
         try:
             check_for_redirect(response)
         except requests.exceptions.HTTPError:
             print(f'\nPage of the book #{book_id} is not found')
             continue
+
         page_soup = BeautifulSoup(response.text, 'lxml')
-        download_txt(
-            (url_book_download, {'id': book_id}),
-            f'{book_id}. {parse_book_page(page_soup)["book_title"][0]}.txt'
-        )
-        download_image(parse_book_page(page_soup)['book_image_url'])
+
+        try:
+            download_txt(
+                (url_book_download, {'id': book_id}),
+                f'{book_id}. {parse_book_page(page_soup)["book_title"][0]}.txt'
+            )
+        except:
+            print(f'Error download txt file of book #{book_id}')
+
+        try:
+            download_image(parse_book_page(page_soup)['book_image_url'])
+        except:
+            print(f'Error download image file of book #{book_id}')
 
 
 if __name__ == '__main__':
