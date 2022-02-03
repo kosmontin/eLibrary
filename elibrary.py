@@ -19,8 +19,7 @@ def download_image(url, folder='images'):
     filename = os.path.basename(urlparse(url).path)
     response = requests.get(url)
     response.raise_for_status()
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, filename), 'wb') as file:
         file.write(response.content)
 
@@ -28,8 +27,7 @@ def download_image(url, folder='images'):
 def download_txt(url: tuple, filename, folder='books'):
     response = requests.get(url[0], params=url[1])
     response.raise_for_status()
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, pathvalidate.sanitize_filename(filename)), 'wb') as file:
         file.write(response.content)
 
