@@ -10,9 +10,9 @@ from tqdm import tqdm
 URL_BOOK_PAGE = 'http://tululu.org/b{}/'
 
 
-def check_for_redirect(response):
+def check_for_redirect(response, text=''):
     if response.history:
-        raise requests.exceptions.HTTPError
+        raise requests.exceptions.HTTPError(text)
 
 
 def download_image(url, folder='images'):
@@ -28,6 +28,7 @@ def download_txt(url: tuple, filename, folder='books'):
     book_url, params = url
     response = requests.get(book_url, params=params)
     response.raise_for_status()
+    check_for_redirect(response, 'Trying to download txt file')
     os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, pathvalidate.sanitize_filename(filename)), 'w') as file:
         file.write(response.text)
@@ -66,7 +67,7 @@ def main():
             )
             download_image(book_info['book_image_url'])
         except (requests.HTTPError, requests.ConnectionError) as e:
-            print(f'Error downloading the book #{book_id}\n')
+            print(f'\n\nError downloading the book #{book_id}\n')
             print('Details below: ')
             print(e.args)
 
