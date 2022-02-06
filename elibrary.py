@@ -38,7 +38,8 @@ def parse_book_page(page_content):
     book_soup = page_content.find('div', {'id': 'content'})
     book_name, book_author = book_soup.find('h1').text.replace('\xa0', '').replace('  ', '').split('::')
     book_info = {
-        'book_title': {'book_author': book_author, 'book_name': book_name},
+        'book_author': book_author,
+        'book_name': book_name,
         'book_image_url': urljoin(URL_BOOK_PAGE, book_soup.find('div', class_='bookimage').find('img').attrs['src']),
         'book_comments': [comment.string for comment in book_soup.find_all('span', class_='black')],
         'book_genres': [genre.get_text() for genre in book_soup.find('span', class_='d_book').find_all('a')]
@@ -63,7 +64,7 @@ def main():
             book_info = parse_book_page(page_soup)
             download_txt(
                 (url_book_download, {'id': book_id}),
-                f'{book_id}. {book_info["book_title"]["book_name"]}.txt'
+                f'{book_id}. {book_info["book_name"]}.txt'
             )
             download_image(book_info['book_image_url'])
         except (requests.HTTPError, requests.ConnectionError) as e:
