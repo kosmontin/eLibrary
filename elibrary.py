@@ -25,7 +25,8 @@ def download_image(url, folder='images'):
 
 
 def download_txt(url: tuple, filename, folder='books'):
-    response = requests.get(url[0], params=url[1])
+    book_url, params = url
+    response = requests.get(book_url, params=params)
     response.raise_for_status()
     os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, pathvalidate.sanitize_filename(filename)), 'w') as file:
