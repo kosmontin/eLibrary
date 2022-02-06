@@ -57,32 +57,18 @@ def main():
         try:
             response = requests.get(URL_BOOK_PAGE.format(book_id))
             response.raise_for_status()
-        except Exception as e:
-            print(f'Error opening page with book #{book_id}. \nDetails below: ')
-            print(e.args)
-            continue
-
-        try:
             check_for_redirect(response)
-        except requests.exceptions.HTTPError:
-            print(f'\nPage of the book #{book_id} is not found')
-            continue
-
-        page_soup = BeautifulSoup(response.text, 'lxml')
-        book_info = parse_book_page(page_soup)
-
-        try:
+            page_soup = BeautifulSoup(response.text, 'lxml')
+            book_info = parse_book_page(page_soup)
             download_txt(
                 (url_book_download, {'id': book_id}),
                 f'{book_id}. {book_info["book_title"]["book_name"]}.txt'
             )
-        except:
-            print(f'\nError download txt file of book #{book_id}')
-
-        try:
             download_image(book_info['book_image_url'])
-        except:
-            print(f'Error download image file of book #{book_id}')
+        except (requests.HTTPError, requests.ConnectionError) as e:
+            print(f'Error downloading the book #{book_id}\n')
+            print('Details below: ')
+            print(e.args)
 
 
 if __name__ == '__main__':
