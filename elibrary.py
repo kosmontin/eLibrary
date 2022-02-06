@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 URL_BOOK_PAGE = 'http://tululu.org/b{}/'
+URL_BOOK_DOWNLOAD = 'http://tululu.org/txt.php'
 
 
 def check_for_redirect(response, text=''):
@@ -24,9 +25,8 @@ def download_image(url, folder='images'):
         file.write(response.content)
 
 
-def download_txt(url: tuple, filename, folder='books'):
-    book_url, params = url
-    response = requests.get(book_url, params=params)
+def download_txt(book_id, filename, folder='books'):
+    response = requests.get(URL_BOOK_DOWNLOAD, params={'id': book_id})
     response.raise_for_status()
     check_for_redirect(response, 'Trying to download txt file')
     os.makedirs(folder, exist_ok=True)
@@ -48,8 +48,6 @@ def parse_book_page(page_content):
 
 
 def main():
-    url_book_download = 'http://tululu.org/txt.php'
-
     parse = argparse.ArgumentParser()
     parse.add_argument('start_id', type=int, nargs='?', default=1)
     parse.add_argument('end_id', type=int, nargs='?', default=0)
@@ -62,10 +60,7 @@ def main():
             check_for_redirect(response)
             page_soup = BeautifulSoup(response.text, 'lxml')
             book_info = parse_book_page(page_soup)
-            download_txt(
-                (url_book_download, {'id': book_id}),
-                f'{book_id}. {book_info["book_name"]}.txt'
-            )
+            download_txt(book_id, f'{book_id}. {book_info["book_name"]}.txt')
             download_image(book_info['book_image_url'])
         except (requests.HTTPError, requests.ConnectionError) as e:
             print(f'\n\nError downloading the book #{book_id}\n')
