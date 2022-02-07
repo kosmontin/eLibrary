@@ -43,14 +43,14 @@ def download_txt(book_id, filename, folder='books'):
 
 
 def parse_book_page(page_content):
-    book_soup = page_content.find('div', {'id': 'content'})
-    book_name, book_author = book_soup.find('h1').text.replace('\xa0', '').replace('  ', '').split('::')
+    book_soup = page_content.select_one('div#content')
+    book_name, book_author = book_soup.select_one('h1').text.replace('\xa0', '').replace('  ', '').split('::')
     book_info = {
         'book_author': book_author,
         'book_name': book_name,
-        'book_image_url': urljoin(URL_BOOK_PAGE, book_soup.find('div', class_='bookimage').find('img').attrs['src']),
-        'book_comments': [comment.string for comment in book_soup.find_all('span', class_='black')],
-        'book_genres': [genre.get_text() for genre in book_soup.find('span', class_='d_book').find_all('a')]
+        'book_image_url': urljoin(URL_BOOK_PAGE, book_soup.select_one('div.bookimage img').attrs['src']),
+        'book_comments': [comment.string for comment in book_soup.select('span.black')],
+        'book_genres': [genre.get_text() for genre in book_soup.select('span.d_book a')]
     }
     return book_info
 
