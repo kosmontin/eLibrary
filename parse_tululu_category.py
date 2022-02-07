@@ -5,10 +5,10 @@ URL_FANTASY_CATEGORY = 'http://tululu.org/l55/'
 URL_SITE = 'http://tululu.org'
 
 
-def get_books_id(url=URL_FANTASY_CATEGORY):
+def get_books_id(start_page, end_page, url=URL_FANTASY_CATEGORY):
     books_id = []
-    num_page = 1
-    while num_page <= 4:
+    num_page = start_page
+    while num_page <= end_page:
         response = requests.get(f'{url}{num_page}/')
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'lxml')

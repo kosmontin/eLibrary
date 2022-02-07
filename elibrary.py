@@ -6,7 +6,6 @@ from urllib.parse import urljoin, urlparse
 import pathvalidate
 import requests
 from bs4 import BeautifulSoup
-from tqdm import tqdm
 
 from parse_tululu_category import get_books_id
 
@@ -56,14 +55,16 @@ def parse_book_page(page_content):
 
 
 def main():
-    # parse = argparse.ArgumentParser()
-    # parse.add_argument('start_id', type=int, nargs='?', default=1)
-    # parse.add_argument('end_id', type=int, nargs='?', default=0)
-    # args = parse.parse_args()
-    # for book_id in tqdm(range(args.start_id, args.start_id + 1 if not args.end_id else args.end_id + 1)):
+    parse = argparse.ArgumentParser()
+    parse.add_argument('--start_page', type=int, default=1)
+    parse.add_argument('--end_page', type=int, default=0)
+    args = parse.parse_args()
+    start_page = args.start_page
+    end_page = args.end_page if args.end_page else start_page
+
     books_info = []
 
-    for book_id in tqdm(get_books_id()):
+    for book_id in get_books_id(start_page, end_page):
         try:
             response = requests.get(URL_BOOK_PAGE.format(book_id))
             response.raise_for_status()
@@ -81,10 +82,11 @@ def main():
                     'genres': book_info['book_genres']
                 }
             )
+            print(URL_BOOK_PAGE.format(book_id))
         except (requests.HTTPError, requests.ConnectionError) as e:
-            print(f'\n\nError downloading the book #{book_id}\n')
+            print(f'\nError downloading the book #{book_id} (URL: {URL_BOOK_PAGE.format(book_id)})')
             print('Details below: ')
-            print(e.args)
+            print(e.args, '\n')
 
     with open('books_info.json', 'w', encoding='utf-8') as json_file:
         json.dump(books_info, json_file, ensure_ascii=False)
