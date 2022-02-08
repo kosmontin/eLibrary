@@ -19,23 +19,24 @@ def check_for_redirect(response, text=''):
         raise requests.exceptions.HTTPError(text)
 
 
-def download_image(url, folder='images'):
+def download_image(url, folder):
     filename = os.path.basename(urlparse(url).path)
-    path = os.path.join(folder, filename)
+    folder_path = os.path.join(folder, 'images')
+    path = os.path.join(folder_path, filename)
     response = requests.get(url)
     response.raise_for_status()
-    os.makedirs(folder, exist_ok=True)
+    os.makedirs(folder_path, exist_ok=True)
     with open(path, 'wb') as file:
         file.write(response.content)
     return path
 
 
-def download_txt(book_id, filename, folder='books'):
-    path = os.path.join(folder, pathvalidate.sanitize_filename(filename))
+def download_txt(book_id, filename, folder):
+    path = os.path.join(folder, 'books', pathvalidate.sanitize_filename(filename))
     response = requests.get(URL_BOOK_DOWNLOAD, params={'id': book_id})
     response.raise_for_status()
     check_for_redirect(response, 'Trying to download txt file')
-    os.makedirs(folder, exist_ok=True)
+    os.makedirs(os.path.join(folder, 'books'), exist_ok=True)
     with open(path, 'w', encoding='utf-8') as file:
         file.write(response.text)
     return path
@@ -58,9 +59,17 @@ def main():
     parse = argparse.ArgumentParser()
     parse.add_argument('--start_page', type=int, default=1)
     parse.add_argument('--end_page', type=int, default=0)
+    parse.add_argument('--dest_folder', type=str, default='')
+    parse.add_argument('--skip_imgs', type=bool, default=False)
+    parse.add_argument('--skip_txt', type=bool, default=False)
+    parse.add_argument('--json_path', type=str, default='')
     args = parse.parse_args()
     start_page = args.start_page
     end_page = args.end_page if args.end_page else start_page
+    dest_folder = args.dest_folder
+    skip_imgs = args.skip_imgs
+    skip_txt = args.skip_txt
+    json_path = args.json_path if args.json_path else os.path.join(dest_folder, 'books_info.json')
 
     books_info = []
 
@@ -76,8 +85,10 @@ def main():
                 {
                     'title': book_info['book_name'],
                     'author': book_info['book_author'],
-                    'img_src': download_image(book_info['book_image_url']),
-                    'book_path': download_txt(book_id, f'{book_id}. {book_info["book_name"]}.txt'),
+                    'img_src': '' if skip_imgs else download_image(book_info['book_image_url'], folder=dest_folder),
+                    'book_path': '' if skip_txt else download_txt(
+                        book_id, f'{book_id}. {book_info["book_name"]}.txt', folder=dest_folder
+                    ),
                     'comments': book_info['book_comments'],
                     'genres': book_info['book_genres']
                 }
@@ -88,7 +99,8 @@ def main():
             print('Details below: ')
             print(e.args, '\n')
 
-    with open('books_info.json', 'w', encoding='utf-8') as json_file:
+    os.makedirs(os.path.dirname(json_path), exist_ok=True)
+    with open(json_path, 'w', encoding='utf-8') as json_file:
         json.dump(books_info, json_file, ensure_ascii=False)
 
 
