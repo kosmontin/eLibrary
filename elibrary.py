@@ -90,19 +90,13 @@ def main():
             check_for_redirect(response)
             page_soup = BeautifulSoup(response.text, 'lxml')
             book_info = parse_book_page(page_soup)
-
-            books_info.append(
-                {
-                    'title': book_info['book_name'],
-                    'author': book_info['book_author'],
-                    'img_src': '' if skip_imgs else download_image(book_info['book_image_url'], folder=dest_folder),
-                    'book_path': '' if skip_txt else download_txt(
-                        book_id, f'{book_id}. {book_info["book_name"]}.txt', folder=dest_folder
-                    ),
-                    'comments': book_info['book_comments'],
-                    'genres': book_info['book_genres']
-                }
+            book_info['img_src'] = '' if skip_imgs else download_image(book_info['book_image_url'], folder=dest_folder)
+            book_info['book_path'] = '' if skip_txt else download_txt(
+                book_id,
+                f'{book_id}. {book_info["book_name"]}.txt',
+                folder=dest_folder
             )
+            books_info.append(book_info)
             print(BOOK_PAGE_URL.format(book_id))
         except (requests.HTTPError, requests.ConnectionError) as e:
             print(f'\nError downloading the book #{book_id} (URL: {BOOK_PAGE_URL.format(book_id)})')
