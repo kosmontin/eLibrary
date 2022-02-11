@@ -97,7 +97,6 @@ def main():
                 folder=dest_folder
             )
             books_info.append(book_info)
-            print(BOOK_PAGE_URL.format(book_id))
         except (requests.HTTPError, requests.ConnectionError) as e:
             print(f'\nError downloading the book #{book_id} (URL: {BOOK_PAGE_URL.format(book_id)})')
             print('Details below: ')
