@@ -9,9 +9,9 @@ from bs4 import BeautifulSoup
 
 from parse_tululu_category import get_books_id
 
-URL_BOOK_PAGE = 'http://tululu.org/b{}/'
-URL_BOOK_DOWNLOAD = 'http://tululu.org/txt.php'
-URL_FANTASY_CATEGORY = 'http://tululu.org/l55/'
+BOOK_PAGE_URL = 'http://tululu.org/b{}/'
+DOWNLOAD_BOOK_URL = 'http://tululu.org/txt.php'
+FANTASY_SECTION_URL = 'http://tululu.org/l55/'
 
 
 def check_for_redirect(response, text=''):
@@ -33,7 +33,7 @@ def download_image(url, folder):
 
 def download_txt(book_id, filename, folder):
     path = os.path.join(folder, 'books', pathvalidate.sanitize_filename(filename))
-    response = requests.get(URL_BOOK_DOWNLOAD, params={'id': book_id})
+    response = requests.get(DOWNLOAD_BOOK_URL, params={'id': book_id})
     response.raise_for_status()
     check_for_redirect(response, 'Trying to download txt file')
     os.makedirs(os.path.join(folder, 'books'), exist_ok=True)
@@ -48,7 +48,7 @@ def parse_book_page(page_content):
     book_info = {
         'book_author': book_author,
         'book_name': book_name,
-        'book_image_url': urljoin(URL_BOOK_PAGE, book_soup.select_one('div.bookimage img').attrs['src']),
+        'book_image_url': urljoin(BOOK_PAGE_URL, book_soup.select_one('div.bookimage img').attrs['src']),
         'book_comments': [comment.string for comment in book_soup.select('span.black')],
         'book_genres': [genre.get_text() for genre in book_soup.select('span.d_book a')]
     }
@@ -75,7 +75,7 @@ def main():
 
     for book_id in get_books_id(start_page, end_page):
         try:
-            response = requests.get(URL_BOOK_PAGE.format(book_id))
+            response = requests.get(BOOK_PAGE_URL.format(book_id))
             response.raise_for_status()
             check_for_redirect(response)
             page_soup = BeautifulSoup(response.text, 'lxml')
@@ -93,9 +93,9 @@ def main():
                     'genres': book_info['book_genres']
                 }
             )
-            print(URL_BOOK_PAGE.format(book_id))
+            print(BOOK_PAGE_URL.format(book_id))
         except (requests.HTTPError, requests.ConnectionError) as e:
-            print(f'\nError downloading the book #{book_id} (URL: {URL_BOOK_PAGE.format(book_id)})')
+            print(f'\nError downloading the book #{book_id} (URL: {BOOK_PAGE_URL.format(book_id)})')
             print('Details below: ')
             print(e.args, '\n')
 

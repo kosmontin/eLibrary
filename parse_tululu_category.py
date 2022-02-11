@@ -1,11 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
 
-URL_FANTASY_CATEGORY = 'http://tululu.org/l55/'
-URL_SITE = 'http://tululu.org'
+FANTASY_SECTION_URL = 'http://tululu.org/l55/'
+
+SITE_URL = 'http://tululu.org'
 
 
-def get_books_id(start_page, end_page, url=URL_FANTASY_CATEGORY):
+def get_books_id(start_page, end_page, url=FANTASY_SECTION_URL):
     books_id = []
     num_page = start_page
     while num_page <= end_page:
