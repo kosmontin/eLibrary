@@ -69,8 +69,8 @@ def main():
     parse.add_argument('--start_page', type=int, default=1)
     parse.add_argument('--end_page', type=int)
     parse.add_argument('--dest_folder', type=str, default='')
-    parse.add_argument('--skip_imgs', type=bool, default=False)
-    parse.add_argument('--skip_txt', type=bool, default=False)
+    parse.add_argument('--skip_imgs', action='store_true')
+    parse.add_argument('--skip_txt', action='store_true')
     parse.add_argument('--json_path', type=str, default='')
     args = parse.parse_args()
     start_page = args.start_page
