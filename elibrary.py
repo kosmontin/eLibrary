@@ -98,9 +98,9 @@ def main():
             )
             books_info.append(book_info)
         except (requests.HTTPError, requests.ConnectionError) as e:
-            print(f'\nError downloading the book #{book_id} (URL: {BOOK_PAGE_URL.format(book_id)})')
+            print(f'Error downloading the book #{book_id} (URL: {BOOK_PAGE_URL.format(book_id)})')
             print('Details below: ')
-            print(e.args, '\n')
+            print(e.args)
 
     os.makedirs(os.path.dirname(json_path), exist_ok=True)
     with open(json_path, 'w', encoding='utf-8') as json_file:
