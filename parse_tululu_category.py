@@ -17,7 +17,3 @@ def get_books_id(start_page, end_page, url=URL_FANTASY_CATEGORY):
             books_id.append(book.select_one('a').attrs['href'][2:-1])
         num_page += 1
     return books_id
-
-
-if __name__ == '__main__':
-    pass
