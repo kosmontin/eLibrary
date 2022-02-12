@@ -74,8 +74,7 @@ def main():
     parse.add_argument('--json_path')
     args = parse.parse_args()
     start_page = args.start_page
-    num = get_lastpage_num()
-    end_page = num if num else start_page
+    end_page = get_lastpage_num()
     dest_folder = args.dest_folder
     skip_imgs = args.skip_imgs
     skip_txt = args.skip_txt
