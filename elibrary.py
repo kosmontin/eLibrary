@@ -67,14 +67,14 @@ def get_lastpage_num(url=FANTASY_SECTION_URL):
 def main():
     parse = argparse.ArgumentParser()
     parse.add_argument('--start_page', type=int, default=1)
-    parse.add_argument('--end_page', type=int)
+    parse.add_argument('--end_page', type=int, default=get_lastpage_num())
     parse.add_argument('--dest_folder', type=str, default='.')
     parse.add_argument('--skip_imgs', action='store_true')
     parse.add_argument('--skip_txt', action='store_true')
     parse.add_argument('--json_path')
     args = parse.parse_args()
     start_page = args.start_page
-    end_page = args.end_page if args.end_page else get_lastpage_num()
+    end_page = args.end_page
     dest_folder = args.dest_folder
     skip_imgs = args.skip_imgs
     skip_txt = args.skip_txt
