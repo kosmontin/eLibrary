@@ -1,3 +1,4 @@
+import json
 # from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -9,9 +10,13 @@ env = Environment(
 
 template = env.get_template('cards_template.html')
 
-rendered_page = template.render(
-    cap1_title="Красная кепка",
+books_info = []
+with open('books_info.json', 'r', encoding='utf-8') as file:
+    books_info = json.load(file)
 
+rendered_page = template.render(
+    books_info=books_info,
+    title='Книги'
 )
 
 with open('index.html', 'w', encoding="utf8") as file:
