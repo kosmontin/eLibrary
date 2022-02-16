@@ -22,7 +22,7 @@ def check_for_redirect(response, text=''):
 def download_image(url, folder):
     filename = os.path.basename(urlparse(url).path)
     folder_path = os.path.join(folder, 'images')
-    path = os.path.join(folder_path, filename)
+    path = os.path.join(folder_path, filename).replace('\\', '/')
     response = requests.get(url)
     response.raise_for_status()
     os.makedirs(folder_path, exist_ok=True)
@@ -32,7 +32,7 @@ def download_image(url, folder):
 
 
 def download_txt(book_id, filename, folder):
-    path = os.path.join(folder, 'books', pathvalidate.sanitize_filename(filename))
+    path = os.path.join(folder, 'books', pathvalidate.sanitize_filename(filename)).replace('\\', '/')
     response = requests.get(DOWNLOAD_BOOK_URL, params={'id': book_id})
     response.raise_for_status()
     check_for_redirect(response, 'Trying to download txt file')
@@ -68,7 +68,7 @@ def main():
     parse = argparse.ArgumentParser()
     parse.add_argument('--start_page', type=int, default=1)
     parse.add_argument('--end_page', type=int, default=get_lastpage_num())
-    parse.add_argument('--dest_folder', type=str, default='.')
+    parse.add_argument('--dest_folder', type=str, default='')
     parse.add_argument('--skip_imgs', action='store_true')
     parse.add_argument('--skip_txt', action='store_true')
     parse.add_argument('--json_path')
@@ -101,7 +101,8 @@ def main():
             print('Details below: ')
             print(e.args)
 
-    os.makedirs(os.path.dirname(json_path), exist_ok=True)
+    if os.path.dirname(json_path):
+        os.makedirs(os.path.dirname(json_path), exist_ok=True)
     with open(json_path, 'w', encoding='utf-8') as json_file:
         json.dump(books_info, json_file, ensure_ascii=False)
 
