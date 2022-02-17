@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
     <title>Книги. Страница #{{ num_page }}</title>
   </head>
   <body>
   <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center pt-3">
       <li class="page-item {% if num_page == 1 %} disabled {% endif %}">
-        <a class="page-link " href="/pages/index{% if num_page - 1 > 1 %}{{ num_page - 1 }}{% endif%}.html">Назад</a>
+        <a class="page-link " href="../pages/index{% if num_page - 1 > 1 %}{{ num_page - 1 }}{% endif%}.html">Назад</a>
       </li>
       {% for num in range(1, num_pages+1) %}
         {% if num == num_page %}
@@ -22,11 +22,11 @@
             <a class="page-link" href="#">{{ num }}<span class="sr-only">(current)</span></a>
           </li>
         {% else %}
-          <li class="page-item"><a class="page-link" href="/pages/index{% if num > 1 %}{{ num }}{% endif%}.html">{{ num }}</a></li>
+          <li class="page-item"><a class="page-link" href="../pages/index{% if num > 1 %}{{ num }}{% endif%}.html">{{ num }}</a></li>
         {% endif %}
       {% endfor %}
       <li class="page-item {% if num_page == num_pages %} disabled {% endif %}">
-        <a class="page-link" href="/pages/index{{num_page + 1}}.html">Вперед</a>
+        <a class="page-link" href="../pages/index{{num_page + 1}}.html">Вперед</a>
       </li>
     </ul>
   </nav>
@@ -38,7 +38,7 @@
               <div class="card mb-3" style="max-width: 540px;">
                 <div class="row no-gutters">
                   <div class="col-md-4">
-                    <img src="/{{ book['img_src'] | urlencode }}" class="card-img" alt="{{ book['book_name'] }}">
+                    <img src="../{{ book['img_src'] | urlencode }}" class="card-img" alt="{{ book['book_name'] }}">
                   </div>
                   <div class="col-md-8">
                     <div class="card-body">
@@ -50,7 +50,7 @@
                         {% endfor %}
                       </p>
                       <p class="card-text">
-                        <a href="/{{ book['book_path'] | urlencode }}" target="_blank">Читать</a>
+                        <a href="../{{ book['book_path'] | urlencode }}" target="_blank">Читать</a>
                       </p>
 
                     </div>
@@ -66,8 +66,8 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="/static/js/jquery-3.3.1.slim.min.js"></script>
-    <script src="/static/js/popper.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery-3.3.1.slim.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
   </body>
 </html>
