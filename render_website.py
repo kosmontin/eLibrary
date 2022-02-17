@@ -1,4 +1,5 @@
 import json
+import math
 import os
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -7,6 +8,7 @@ from more_itertools import chunked
 
 
 def on_reload():
+    books_per_page = 20
     env = Environment(
         loader=FileSystemLoader('./templates'),
         autoescape=select_autoescape(['html', 'xml'])
@@ -15,12 +17,14 @@ def on_reload():
     template = env.get_template('cards_template.html')
     with open('books_info.json', 'r', encoding='utf-8') as file:
         books_info = json.load(file)
-    chunked_books_info = enumerate(chunked(books_info, 20), start=1)
+    chunked_books_info = enumerate(chunked(books_info, books_per_page), start=1)
     os.makedirs('pages', exist_ok=True)
+
     for num_page, part_of_book in chunked_books_info:
         rendered_page = template.render(
-            chunked_books_info=chunked(part_of_book, 2),
-            title=f'Книги. Страница #{num_page}'
+            num_page=num_page,
+            num_pages=math.ceil(len(books_info) / books_per_page),
+            chunked_books_info=chunked(part_of_book, 2)
         )
         with open(f'pages/index{num_page}.html', 'w', encoding="utf8") as file:
             file.write(rendered_page)
