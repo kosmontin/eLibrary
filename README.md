@@ -62,11 +62,11 @@ project
 │   │   1. favicon.ico
 │   │   2. how_to_download.jpg
 │
-└───pages
+└───images
 │   │   1. file1.txt
 │   │   2. file2.txt
 │
-└───books
+└───pages
 │   │   1. file1.txt
 │   │   2. file2.txt
 │
