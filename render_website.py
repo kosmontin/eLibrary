@@ -26,7 +26,7 @@ def on_reload():
             num_pages=math.ceil(len(books_info) / books_per_page),
             chunked_books_info=chunked(part_of_book, 2)
         )
-        with open(f'pages/index{num_page}.html', 'w', encoding="utf8") as file:
+        with open(f'pages/index{num_page if num_page > 1 else ""}.html', 'w', encoding="utf8") as file:
             file.write(rendered_page)
 
 
