@@ -16,14 +16,14 @@ def on_reload():
 
     template = env.get_template('cards_template.html')
     with open('books_info.json', 'r', encoding='utf-8') as file:
-        books_info = json.load(file)
-    chunked_books_info = enumerate(chunked(books_info, books_per_page), start=1)
+        books = json.load(file)
+    chunked_books = enumerate(chunked(books, books_per_page), start=1)
     os.makedirs('pages', exist_ok=True)
 
-    for num_page, part_of_book in chunked_books_info:
+    for num_page, part_of_book in chunked_books:
         rendered_page = template.render(
             num_page=num_page,
-            num_pages=math.ceil(len(books_info) / books_per_page),
+            num_pages=math.ceil(len(books) / books_per_page),
             chunked_books_info=chunked(part_of_book, 2)
         )
         with open(f'pages/index{num_page if num_page > 1 else ""}.html', 'w', encoding="utf8") as file:
