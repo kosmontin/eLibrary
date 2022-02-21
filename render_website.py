@@ -20,13 +20,13 @@ def on_reload():
     chunked_books = enumerate(chunked(books, books_per_page), start=1)
     os.makedirs('pages', exist_ok=True)
 
-    for num_page, part_of_book in chunked_books:
+    for page_num, books_part in chunked_books:
         rendered_page = template.render(
-            num_page=num_page,
-            num_pages=math.ceil(len(books) / books_per_page),
-            chunked_books_info=chunked(part_of_book, 2)
+            page_num=page_num,
+            pages_num=math.ceil(len(books) / books_per_page),
+            chunked_books=chunked(books_part, 2)
         )
-        with open(f'pages/index{num_page if num_page > 1 else ""}.html', 'w', encoding="utf8") as file:
+        with open(f'pages/index{page_num if page_num > 1 else ""}.html', 'w', encoding="utf8") as file:
             file.write(rendered_page)
 
 
